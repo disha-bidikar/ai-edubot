@@ -14,49 +14,35 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
-// Test route
+// Initialize OpenAI client once
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// ✅ Test route
 app.get("/test", (req, res) => {
-  res.send("Server is running!");
+  res.send("✅ Server is running!");
 });
 
-// Chat route
-const completion = await client.chat.completions.create({
-  model: "gpt-4o-mini",
-  messages: [
-    {
-      role: "system",
-      content: `
-You are EduBot, an AI tutor. 
-- Explain concepts clearly and in simple language. 
-- Provide examples when possible. 
-- Encourage learning and critical thinking. 
-- Ask guiding questions to engage students. 
-- Tailor explanations according to the subject selected by the user.
-`
-    },
-    { role: "user", content: userMessage },
-  ],
-});
-
-
-app.listen(PORT, HOST, () =>
-  console.log(`🚀 Server running on http://${HOST}:${PORT}`)
-);
+// ✅ Chat route (main AI endpoint)
 app.post("/chat", async (req, res) => {
   try {
     const { message, subject, history } = req.body;
-
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const messages = [
       {
         role: "system",
         content: `
-You are EduBot, an AI tutor. 
-- Explain ${subject} concepts clearly.
-- Give examples and encourage learning.
-- Use previous messages if relevant.
-`
+You are EduBot, an AI tutor and problem solver.
+Your goals:
+- Teach and assist students in learning ${subject || "academic"} topics.
+- When given a question or problem (e.g. math, physics, or logic), solve it step-by-step.
+- Show all reasoning clearly and neatly.
+- If the question is conceptual, explain it with simple examples.
+- Encourage curiosity and critical thinking.
+- Never just give the final answer — always show how you got it.
+- Keep your tone friendly, supportive, and educational.
+        `
       },
       ...(history || []).map(h => ({ role: h.role, content: h.content })),
       { role: "user", content: message }
@@ -64,12 +50,18 @@ You are EduBot, an AI tutor.
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages
+      messages,
+      temperature: 0.7, // balanced creativity + accuracy
     });
 
     res.json({ reply: completion.choices[0].message.content });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Something went wrong." });
+    console.error("❌ Error:", error);
+    res.status(500).json({ error: "Something went wrong on the server." });
   }
 });
+
+// ✅ Start server
+app.listen(PORT, HOST, () =>
+  console.log(`🚀 Server running on http://${HOST}:${PORT}`)
+);
