@@ -54,7 +54,13 @@ Your goals:
       temperature: 0.7, // balanced creativity + accuracy
     });
 
-    res.json({ reply: completion.choices[0].message.content });
+    // Extract the model’s reply safely
+    const reply =
+      completion?.choices?.[0]?.message?.content ||
+      "⚠️ Sorry, I didn’t understand that.";
+
+    // Return to frontend
+    res.json({ reply });
   } catch (error) {
     console.error("❌ Error:", error);
     res.status(500).json({ error: "Something went wrong on the server." });
