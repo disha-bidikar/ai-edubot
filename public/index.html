@@ -8,22 +8,32 @@
 </head>
 <body>
   <div class="container">
-    <h1>AI EduBot</h1>
-    <div class="chat-container">
-      <div id="chat-box"></div>
-      <div class="input-area">
-        <select id="subject-select">
-          <option value="General">General</option>
-          <option value="Math">Math</option>
-          <option value="Science">Science</option>
-          <option value="History">History</option>
-          <option value="Programming">Programming</option>
-        </select>
-        <input id="user-input" placeholder="Type a message..." />
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
+    <header>
+      <h1>🎓 AI EduBot</h1>
+    </header>
+
+    <div class="chat-container" id="chat-box"></div>
+
+    <form id="chat-form">
+      <select id="subject">
+        <option value="general">General</option>
+        <option value="math">Math</option>
+        <option value="science">Science</option>
+        <option value="history">History</option>
+        <option value="english">English</option>
+        <option value="programming">Programming</option>
+      </select>
+
+      <input type="text" id="chat-input" placeholder="Type your question..." autocomplete="off" />
+
+      <button type="submit">Send</button>
+    </form>
   </div>
+
+  <!-- Optional: message sound -->
+  <audio id="message-sound" src="message.mp3" preload="auto"></audio>
+
   <script src="script.js"></script>
 </body>
 </html>
+
